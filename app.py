@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify, render_template, redirect, url_for, flash, session
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -7,11 +8,13 @@ from firebase_admin import credentials, auth
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
+# 환경 변수에서 경로 불러오기
+google_credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS', 'secrets/credentials.json')
+firebase_credentials_path = os.getenv('FIREBASE_ADMIN_CREDENTIALS', 'secrets/firebase-adminsdk.json')
+
 # Google Sheets API 인증 설정
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name(
-    "C:/Users/LEE YEONGWOONG/Desktop/dasi/credentials.json", scope
-)
+creds = ServiceAccountCredentials.from_json_keyfile_name(google_credentials_path, scope)
 client = gspread.authorize(creds)
 
 # 스프레드시트 및 시트 설정
@@ -20,7 +23,7 @@ sheet_name = '2024년'
 sheet = client.open_by_key(spreadsheet_id).worksheet(sheet_name)
 
 # Firebase Admin SDK 초기화
-firebase_cred = credentials.Certificate('C:/Users/LEE YEONGWOONG/Desktop/dasi/firebase-adminsdk.json')
+firebase_cred = credentials.Certificate(firebase_credentials_path)
 firebase_admin.initialize_app(firebase_cred)
 
 @app.route('/login', methods=['GET', 'POST'])
