@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <!-- Bootstrap CSS 추가 -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5; /* 페이스북 배경색 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif; /* 전문적인 폰트 */
+        }
+        .container {
+            max-width: 400px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .btn-custom {
+            background-color: #3b5998; /* 페이스북 파란색 */
+            border-color: #3b5998;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #334d84;
+            border-color: #334d84;
+        }
+        .alert-custom {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            left: 0;
+            text-align: center;
+            z-index: 1050;
+        }
+        .form-group label {
+            font-weight: bold; /* 전문적인 느낌 */
+        }
+        h2 {
+            color: #3b5998;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="mb-4">KTLA 농장 매니저</h2>
+    <div class="container">
+        <form method="POST">
+            <div class="form-group">
+                <label for="user_id">사용자 ID</label>
+                <input type="text" class="form-control" id="user_id" name="user_id" required>
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-custom btn-block">로그인</button>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show alert-custom" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+    <!-- Bootstrap JS 추가 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
