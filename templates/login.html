@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인</title>
+    <title>KTLA 농장 매니저 로그인</title>
     <!-- Bootstrap CSS 추가 -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f0f2f5; /* 페이스북 배경색 */
+            background: url('/static/img/background.jpg') no-repeat center center fixed; 
+            background-size: cover;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -16,7 +17,18 @@
             height: 100vh;
             font-family: Arial, sans-serif; /* 전문적인 폰트 */
         }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95); /* 투명한 흰색 오버레이, 투명도 40% */
+            z-index: 1;
+        }
         .container {
+            position: relative;
+            z-index: 2;
             max-width: 400px;
             padding: 20px;
             background-color: white;
@@ -24,13 +36,13 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         .btn-custom {
-            background-color: #3b5998; /* 페이스북 파란색 */
-            border-color: #3b5998;
+            background-color: #3CB371; /* 덜 익은 바나나 색 */
+            border-color: #3CB371; /* 덜 익은 바나나 색 */
             color: white;
         }
         .btn-custom:hover {
-            background-color: #334d84;
-            border-color: #334d84;
+            background-color: #ffd400; /* 익은 바나나 색 */
+            border-color: #ffd400; /* 익은 바나나 색 */
         }
         .alert-custom {
             position: absolute;
@@ -44,12 +56,16 @@
             font-weight: bold; /* 전문적인 느낌 */
         }
         h2 {
-            color: #3b5998;
+            color: #3CB371; /* 덜 익은 바나나 색 */
+            font-weight: bold;
             margin-bottom: 20px;
+            position: relative;
+            z-index: 2; /* 투명도 제거 */
         }
     </style>
 </head>
 <body>
+    <div class="overlay"></div>
     <h2 class="mb-4">KTLA 농장 매니저</h2>
     <div class="container">
         <form method="POST">
