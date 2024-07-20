@@ -151,6 +151,135 @@
                 monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
             }).datepicker("setDate", new Date()); // 오늘 날짜로 설정
 
+            let countFertilizer = 0;
+            let countLabor = 0;
+            const maxItems = 6;
+
+            document.getElementById('add-fertilizer').addEventListener('click', function() {
+                if (countFertilizer < maxItems) {
+                    countFertilizer++;
+                    addFertilizerFields(countFertilizer);
+                } else {
+                    alert('최대 6개의 항목만 추가할 수 있습니다.');
+                }
+            });
+
+            document.getElementById('add-labor').addEventListener('click', function() {
+                if (countLabor < maxItems) {
+                    countLabor++;
+                    addLaborFields(countLabor);
+                } else {
+                    alert('최대 6개의 항목만 추가할 수 있습니다.');
+                }
+            });
+
+            function addFertilizerFields(index) {
+                const container = document.getElementById('fertilizer-container');
+                const card = document.createElement('div');
+                card.className = 'card card-custom';
+                card.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">농약 및 비료 기록 ${index}</h5>
+                        <div class="form-group">
+                            <label for="fertilizer-type-${index}">종류</label>
+                            <select class="form-control" id="fertilizer-type-${index}" name="fertilizer-type-${index}">
+                                <option value="살충제">살충제</option>
+                                <option value="제초제">제초제</option>
+                                <option value="유기비료">유기비료</option>
+                                <option value="화학비료">화학비료</option>
+                                <option value="복합비료">복합비료</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-name-${index}">제품명</label>
+                            <input type="text" class="form-control" id="product-name-${index}" name="product-name-${index}" placeholder="예: 비료 이름">
+                        </div>
+                        <div class="form-group">
+                            <label for="amount-${index}">시비량</label>
+                            <input type="text" class="form-control" id="amount-${index}" name="amount-${index}" placeholder="예: 500g">
+                        </div>
+                        <div class="form-group">
+                            <label for="method-${index}">시비방식</label>
+                            <input type="text" class="form-control" id="method-${index}" name="method-${index}" placeholder="예: 살포">
+                        </div>
+                        <div class="form-group">
+                            <label for="ratio-${index}">시비 비율</label>
+                            <input type="text" class="form-control" id="ratio-${index}" name="ratio-${index}" placeholder="예: 1:100">
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm remove-fertilizer">삭제</button>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                card.querySelector('.remove-fertilizer').addEventListener('click', function() {
+                    container.removeChild(card);
+                    countFertilizer--;
+                    updateFertilizerTitles();
+                });
+
+                updateFertilizerTitles();
+            }
+
+            function addLaborFields(index) {
+                const container = document.getElementById('labor-container');
+                const card = document.createElement('div');
+                card.className = 'card card-custom';
+                card.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">작업 인력 기록 ${index}</h5>
+                        <div class="form-group">
+                            <label for="labor-time-${index}">시간</label>
+                            <select class="form-control" id="labor-time-${index}" name="labor-time-${index}">
+                                <option value="오전">오전</option>
+                                <option value="오후">오후</option>
+                                <option value="종일">종일</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="labor-amount-${index}">일력 수</label>
+                            <input type="number" class="form-control" id="labor-amount-${index}" name="labor-amount-${index}" placeholder="예: 5">
+                        </div>
+                        <div class="form-group">
+                            <label for="labor-task-${index}">작업 내용</label>
+                            <input type="text" class="form-control" id="labor-task-${index}" name="labor-task-${index}" placeholder="예: 잡초 제거">
+                        </div>
+                        <div class="form-group">
+                            <label for="labor-result-${index}">작업 결과</label>
+                            <textarea class="form-control" id="labor-result-${index}" name="labor-result-${index}" rows="3" placeholder="예: 잡초 제거 완료"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="labor-manager-${index}">작업 책임자</label>
+                            <input type="text" class="form-control" id="labor-manager-${index}" name="labor-manager-${index}" placeholder="예: 홍길동">
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm remove-labor">삭제</button>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                card.querySelector('.remove-labor').addEventListener('click', function() {
+                    container.removeChild(card);
+                    countLabor--;
+                    updateLaborTitles();
+                });
+
+                updateLaborTitles();
+            }
+
+            function updateFertilizerTitles() {
+                const cards = document.querySelectorAll('#fertilizer-container .card-custom');
+                cards.forEach((card, index) => {
+                    card.querySelector('.card-title').textContent = `농약 및 비료 기록 ${index + 1}`;
+                });
+            }
+
+            function updateLaborTitles() {
+                const cards = document.querySelectorAll('#labor-container .card-custom');
+                cards.forEach((card, index) => {
+                    card.querySelector('.card-title').textContent = `작업 인력 기록 ${index + 1}`;
+                });
+            }
+
             // 비료 필드 토글
             $("#use-fertilizer").on('change', toggleFertilizerFields);
             function toggleFertilizerFields() {
