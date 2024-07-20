@@ -1,29 +1,27 @@
-import os
 from flask import Flask, request, jsonify, render_template, redirect, url_for, flash, session
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import firebase_admin
 from firebase_admin import credentials, auth
+import os
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
-
-# 환경 변수에서 경로 불러오기
-google_credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS', 'secrets/credentials.json')
-firebase_credentials_path = os.getenv('FIREBASE_ADMIN_CREDENTIALS', 'secrets/firebase-adminsdk.json')
+app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')
 
 # Google Sheets API 인증 설정
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name(google_credentials_path, scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name(
+    os.getenv('GOOGLE_SHEET_KEY_PATH'), scope
+)
 client = gspread.authorize(creds)
 
 # 스프레드시트 및 시트 설정
-spreadsheet_id = '1Lyyz09RRpVq1RRu6XRAR5UlLZ5_mti5D74red-yC3xw'
+spreadsheet_id = os.getenv('SPREADSHEET_ID')
 sheet_name = '2024년'
 sheet = client.open_by_key(spreadsheet_id).worksheet(sheet_name)
 
 # Firebase Admin SDK 초기화
-firebase_cred = credentials.Certificate(firebase_credentials_path)
+firebase_cred = credentials.Certificate(os.getenv('FIREBASE_KEY_PATH'))
 firebase_admin.initialize_app(firebase_cred)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -33,9 +31,10 @@ def login():
         password = request.form['password']
         try:
             user = auth.get_user_by_email(user_id)
-            # 여기서 사용자 비밀번호를 확인하는 로직을 추가해야 합니다.
-            # 예를 들어, 비밀번호 해시를 비교하는 방식으로 진행합니다.
-            # Firebase Authentication의 경우, 클라이언트 측에서 인증을 수행하고 서버로 토큰을 전달하는 방식이 일반적입니다.
+            # Firebase Authentication에서 비밀번호 확인 로직 추가
+            # 클라이언트 측에서 로그인 후 토큰을 받아와서 서버에서 검증하는 방식이 일반적입니다.
+            # token = request.form['token']
+            # decoded_token = auth.verify_id_token(token)
             session['user'] = user_id  # 사용자 세션 설정
             flash('로그인 성공!', 'success')
             return redirect(url_for('index'))
@@ -62,6 +61,12 @@ def farmdata():
     data = request.json
     print('Received data:', data)  # 디버깅용 콘솔 로그 추가
     try:
+        # 데이터 유효성 검사
+        required_fields = ['date', 'field', 'weather', 'temperature', 'humidity', 'rainfall', 'use-fertilizer', 'use-remarks', 'remark-text']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'success': False, 'error': f'{field} is required'}), 400
+
         # 공통 데이터
         common_data = [
             data.get('date', ''),                  # A 열
@@ -70,8 +75,8 @@ def farmdata():
             data.get('temperature', ''),           # D 열
             data.get('humidity', ''),              # E 열
             data.get('rainfall', ''),              # F 열
-            data.get('use-fertilizer', ''),        # G 열
-            data.get('use-remarks', ''),           # S 열
+            data.get('use-fertilizer', 'no'),      # G 열
+            data.get('use-remarks', 'no'),         # S 열
             data.get('remark-text', '')            # T 열
         ]
 
@@ -123,7 +128,7 @@ def farmdata():
                 row += [''] * 5
             # 작업 인력 사용 여부
             if i % 5 == 0:
-                row.append(data.get('use-labor', ''))
+                row.append(data.get('use-labor', 'no'))
             else:
                 row.append('')
             # 작업 인력 데이터
@@ -157,6 +162,25 @@ def farmdata():
     except Exception as e:
         print('Error:', e)
         return jsonify({'success': False, 'error': str(e)})
+
+# Google Sheets에서 데이터를 가져와 프론트엔드로 전달하는 엔드포인트 추가
+@app.route('/getdata', methods=['GET'])
+def getdata():
+    if 'user' not in session:
+        return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
+    try:
+        records = sheet.get_all_records()
+        return jsonify({'success': True, 'data': records})
+    except Exception as e:
+        print('Error:', e)
+        return jsonify({'success': False, 'error': str(e)})
+
+# searchdata.html 페이지를 렌더링하는 엔드포인트 추가
+@app.route('/searchdata')
+def searchdata():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('searchdata.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
