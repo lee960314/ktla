@@ -116,8 +116,8 @@ def farmdata():
         rows = []
         for i in range(max_sets * 5):
             row = []
-            # 공통 데이터
-            if i % 5 == 0:
+            # 공통 데이터 반복
+            if i % 5 == 0 or i < len(actual_fertilizer_data) or i < len(actual_labor_data):
                 row += common_data[:7]
             else:
                 row += [''] * 7
@@ -126,8 +126,8 @@ def farmdata():
                 row += actual_fertilizer_data[i]
             else:
                 row += [''] * 5
-            # 작업 인력 사용 여부
-            if i % 5 == 0:
+            # 작업 인력 사용 여부 반복
+            if i % 5 == 0 or i < len(actual_fertilizer_data) or i < len(actual_labor_data):
                 row.append(data.get('use-labor', 'no'))
             else:
                 row.append('')
@@ -136,8 +136,8 @@ def farmdata():
                 row += actual_labor_data[i]
             else:
                 row += [''] * 5
-            # 비고 데이터
-            if i % 5 == 0:
+            # 비고 데이터 반복
+            if i % 5 == 0 or i < len(actual_fertilizer_data) or i < len(actual_labor_data):
                 row += common_data[7:]
             else:
                 row += [''] * 2
